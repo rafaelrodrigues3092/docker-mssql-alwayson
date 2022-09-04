@@ -51,4 +51,4 @@ echo "<#############>    running sql agent failover job"
 
 
 
-echo "#######     ENDED CONFIGURATION    #######"
+echo "#######     COMPLETED CONFIGURATION    #######"

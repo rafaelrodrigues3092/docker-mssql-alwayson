@@ -16,9 +16,9 @@ In your terminal, you should see something like this
 
 ```cmd
 ...
-db1    | ##      AOAG script execution completed     ##
+db1    | #######     COMPLETED CONFIGURATION    #######
 ...
-db2    | ##      AOAG script execution completed     ##
+db2    | #######     COMPLETED CONFIGURATION    #######
 ...
 ```
 
@@ -39,7 +39,16 @@ docker-compose down
 ## Failover
 
 - Only a forced failover works in this type of setup. To perform a failover, connect to the secondary (localhost,2600) and run the command
-  ALTER AVAILABILITY GROUP AG1 FORCE_FAILOVER_ALLOW_DATA_LOSS;
+
+```sql
+ALTER AVAILABILITY GROUP AG1 FORCE_FAILOVER_ALLOW_DATA_LOSS;
+```
+
+To resume data movement:
+
+```sql
+ALTER DATABASE [AdventureWorks] SET HADR RESUME;
+```
 
 ## Troubleshooting
 
