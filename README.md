@@ -39,15 +39,21 @@ docker-compose down
 ## Failover
 
 - Only a forced failover works in this type of setup. To perform a failover, connect to the secondary (localhost,2600) and run the command
-ALTER AVAILABILITY GROUP AG1 FORCE_FAILOVER_ALLOW_DATA_LOSS;
+  ALTER AVAILABILITY GROUP AG1 FORCE_FAILOVER_ALLOW_DATA_LOSS;
 
 ## Troubleshooting
 
 - If you get sa login errors, please adjust the INIT_WAIT values in the docker-compose.yml file.
-Sometimes, depending on the system, the container startup tasks may take longer and the start sequence could potentially try to start configuring AlwaysOn before SQL Server is ready
+  Sometimes, depending on the system, the container startup tasks may take longer and the start sequence could potentially try to start configuring AlwaysOn before SQL Server is ready
 
-- Ensure that the shell scripts (*.sh) always have 'LF' line endings. If for some reason they have Windows-style line endings the scripts will not run
+- Ensure that the shell scripts (\*.sh) always have 'LF' line endings. If for some reason they have Windows-style line endings the scripts will not run
 
-## RHEL MSSQL container images
+## Configuration
 
-<https://catalog.redhat.com/software/containers/mssql/rhel/server/5ba50865f5a0de06555a2ee7?container-tabs=overview>
+Update the .env file appropriately.
+
+`INSTALL_TOOLS` is used to install Powershell (Pwsh), and the PowerShell modules SqlServer and DBATools
+
+## MSSQL container images
+
+<https://hub.docker.com/_/microsoft-mssql-server>

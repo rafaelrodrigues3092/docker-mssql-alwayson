@@ -1,50 +1,59 @@
 version: "3.9"
 
 x-service-environment: &common-variables
-    SA_PASSWORD: "MssqlPass123"
-    ACCEPT_EULA: "Y"
-    MSSQL_AGENT_ENABLED: "true"
-    MASTER_KEY_PASSWORD: "Pa$$w0rd!?*&123"
-    HADR_LOGIN_PASSWORD: "Pa$$w0rd123!?*&"
-    HADR_CERT_PASSWORD: "Pa$$w0rd1*&23!?"
     HADR_PORT: 5022
     INIT_WAIT: 40
+    ACCEPT_EULA: 'Y'
+    IS_AOAG_PRIMARY: False
+    SA_PASSWORD: ${SA_PASSWORD}
+    MASTER_KEY_PASSWORD: ${MASTER_KEY_PASSWORD}
+    HADR_LOGIN_PASSWORD: ${HADR_LOGIN_PASSWORD}
+    HADR_CERT_PASSWORD: ${HADR_CERT_PASSWORD}
+    SHARED_PATH: ${SHARED_PATH}
+    BACKUP_PATH: ${BACKUP_PATH}
 
 services:
 
     db1:
-        build: ./sql
-        environment:
-            <<: *common-variables
-            INIT_SCRIPT: "aoag_primary.sql"
-        ports:
-            - "2500:1433"
         container_name: db1
         hostname: db1
+        build: 
+            context: .\sql
+            args:
+                - INSTALL_TOOLS=${INSTALL_TOOLS}
+        environment:
+            <<: *common-variables
+            IS_AOAG_PRIMARY: True
+            TCP_PORT: ${DB1_TCP_PORT}
+            PARTNER_HOSTNAME: db2
+        ports:
+            - ${DB1_TCP_PORT}:${DB1_TCP_PORT}
         volumes:
-            - mssql-server-shared:/var/opt/mssql/shared
-            - mssql-server-backup:/var/opt/mssql/backup
+            - mssql-server-shared:${SHARED_PATH}
+            - mssql-server-backup:${BACKUP_PATH}
         networks:
             - sqlaoag
 
     db2:
-        build: ./sql
-        depends_on:
-            - "db1"
-        environment:
-            <<: *common-variables
-            INIT_SCRIPT: "aoag_secondary.sql"
-            INIT_WAIT: 60
-        ports:
-            - "2600:1433"
         container_name: db2
         hostname: db2
+        build: 
+            context: .\sql
+            args:
+                - INSTALL_TOOLS=${INSTALL_TOOLS}
+        environment:
+            <<: *common-variables
+            INIT_WAIT: 60
+            TCP_PORT: ${DB2_TCP_PORT}
+        ports:
+            - ${DB2_TCP_PORT}:${DB2_TCP_PORT}
         volumes:
-            - mssql-server-shared:/var/opt/mssql/shared
-            - mssql-server-backup:/var/opt/mssql/backup
+            - mssql-server-shared:${SHARED_PATH}
+            - mssql-server-backup:${BACKUP_PATH}
+        depends_on:
+            - db1
         networks:
             - sqlaoag
-
 
 volumes:
     mssql-server-shared:
